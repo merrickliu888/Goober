@@ -1,4 +1,4 @@
-package com.interpreter.goober;
+package com.goober;
 
 public enum TokenType {
     // Single character tokens
@@ -7,8 +7,10 @@ public enum TokenType {
     // One or two character tokens
     NOT, NOT_EQUAL, EQUAL, EQUAL_EQUAL, GREATER, GREATER_EQUAL, LESS, LESS_EQUAL,
 
+    IDENTIFIER,
+
     // Literals
-    IDENTIFIER, STRING, NUMBER,
+    STRING, NUMBER,
 
     // Keywords
     AND, CLASS, ELSE, FALSE, FUNCTION, FOR, IF, NULL, OR, PRINT, RETURN, SUPER, THIS, TRUE, VAR, WHILE,

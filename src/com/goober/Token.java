@@ -1,4 +1,4 @@
-package com.interpreter.goober;
+package com.goober;
 
 public class Token {
     final TokenType type;

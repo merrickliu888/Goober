@@ -1,4 +1,4 @@
-package com.interpreter.goober;
+package com.goober;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -37,7 +37,7 @@ public class Goober {
         BufferedReader reader = new BufferedReader(input);
 
         while (true) {
-            System.out.print("> ");
+            System.out.print(">>> ");
             String line = reader.readLine();
             if (line == null) break;
             run(line);
