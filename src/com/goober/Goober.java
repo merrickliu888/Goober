@@ -49,8 +49,16 @@ public class Goober {
 
     // For running actual code from a source
     private static void run(String source) {
+        // Scanning
         Scanner scanner = new Scanner(source);
         List<Token> tokens = scanner.scanSource();
+
+        // Parsing
+        Parser parser = new Parser(tokens);
+        Expr expression = parser.parse();
+        if (hadError) return;  // Stop if there was a syntax error
+
+        System.out.println(new AstPrinter().print(expression));
 
         for (Token token : tokens) {
             System.out.println(token);
@@ -58,14 +66,22 @@ public class Goober {
     }
 
     // Error handling (could delegate to interface)
-    public static void error(int line, String message) {
+    static void error(int line, String message) {
         report(line, "", message);
-        hadError = true;
+    }
+
+    static void error(Token token, String message) {
+        if (token.type == TokenType.EOF) {
+            report(token.line, " at end", message);
+        } else {
+            report(token.line, " at '" + token.lexeme + "'", message);
+        }
     }
 
     private static void report(int line, String where, String message) {
         System.err.println(
                 "[line " + line + "] Error" + where + ": " + message
         );
+        hadError = true;
     }
 }

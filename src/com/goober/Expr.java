@@ -45,7 +45,9 @@ abstract class Expr {
 	static class Literal extends Expr {
 		final Object value;
 
-		Literal(Object value) { this.value = value; }
+		Literal(Object value) {
+			this.value = value;
+		}
 
 		@Override
 		<T> T accept(Visitor<T> visitor) {
