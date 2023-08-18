@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://github.com/merrickliu888/Dot/blob/main/Website/frontned/src/assets/Dot.png" alt="Dot" width="75">  
+  <img src="https://github.com/merrickliu888/Goober/blob/main/Goober%20Icon.png" alt="goober-icon" width="75">  
   <h1>Goober</h1>
 </div>
 
