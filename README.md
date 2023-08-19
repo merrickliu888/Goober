@@ -4,3 +4,5 @@
 </div>
 
 Name inspired from Spider-Verse.
+
+Inspirations / Sources: CSC110/111 Course Notes, Crafting Interpreters, and various Youtube Videos.
