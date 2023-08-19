@@ -128,7 +128,7 @@ public class Scanner {
                 } else if (isAlpha(c)) {
                     identifier();
                 } else {
-                    Goober.error(line, "Unexpected character.");
+                    Goober.error(line, "Unexpected character: '" + source.charAt(current - 1) + "'.");
                 }
                 break;
         }

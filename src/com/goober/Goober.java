@@ -40,7 +40,6 @@ public class Goober {
         BufferedReader reader = new BufferedReader(input);
 
         while (true) {
-            System.out.print(">>> ");
             String line = reader.readLine();
             if (line == null) break;
             run(line);
@@ -58,16 +57,10 @@ public class Goober {
 
         // Parsing
         Parser parser = new Parser(tokens);
-        Expr expression = parser.parse();
+        List<Stmt> statements = parser.parse();
         if (hadError) return;  // Stop if there was a syntax error
 
-        interpreter.interpret(expression);
-
-//        System.out.println(new AstPrinter().print(expression));
-//
-//        for (Token token : tokens) {
-//            System.out.println(token);
-//        }
+        interpreter.interpret(statements);
     }
 
     // Error handling (could delegate to interface)
