@@ -57,11 +57,11 @@ public class Scanner {
             case ')':
                 addToken(TokenType.RIGHT_PAREN);
                 break;
-            case '[':
-                addToken(TokenType.LEFT_BRACE);
+            case '{':
+                addToken(TokenType.LEFT_CURLY_BRACE);
                 break;
-            case ']':
-                addToken(TokenType.RIGHT_BRACE);
+            case '}':
+                addToken(TokenType.RIGHT_CURLY_BRACE);
                 break;
             case ',':
                 addToken(TokenType.COMMA);
