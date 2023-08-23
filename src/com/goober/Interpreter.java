@@ -22,7 +22,7 @@ public class Interpreter implements Expr.Visitor<Object>,
 
             @Override
             public String toString() { return "<native function>"; }
-        })
+        });
     }
 
     void interpret(List<Stmt> statements) {
