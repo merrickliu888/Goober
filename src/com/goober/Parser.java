@@ -56,8 +56,20 @@ public class Parser {
         if (match(LEFT_CURLY_BRACE)) return new Stmt.Block(block());
         if (match(WHILE)) return whileStatement();
         if (match(FOR)) return forStatement();
+        if (match(RETURN)) return returnStatement();
 
         return expressionStatement();
+    }
+
+    private Stmt returnStatement() {
+        Token keyword = previous();
+        Expr value = null;
+        if (!check(SEMICOLON)) {
+            value = expression();
+        }
+
+        consume(SEMICOLON, "Expect ';' after return statement.");
+        return new Stmt.Return(keyword, value);
     }
 
     private Stmt forStatement() {
@@ -154,6 +166,28 @@ public class Parser {
         Expr value = expression();
         consume(SEMICOLON, "Expect ';' after expression.");
         return new Stmt.Expression(value);
+    }
+
+    private Stmt.Function function(String kind) {
+        Token name = consume(IDENTIFIER, "Expect " + kind + " name.");
+
+        consume(LEFT_PAREN, "Expect '(' after " + kind + " name.");
+        List<Token> parameters = new ArrayList<>();
+        if (!check(RIGHT_PAREN)) {
+            do {
+                if (parameters.size() >= 255) {
+                    error(peek(), "Cant have more than 255 parameters.");
+                }
+
+                parameters.add(
+                        consume(IDENTIFIER, "Expect parameter name.")
+                );
+            } while (match(COMMA));
+        }
+        consume(RIGHT_PAREN, "Expect ')' after " + kind + " name.");
+        consume(LEFT_CURLY_BRACE, "Expect '{' before " + kind + " body.");
+        List<Stmt> body = block();
+        return new Stmt.Function(name, parameters, body);
     }
 
     // Expressions

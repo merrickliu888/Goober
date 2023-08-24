@@ -67,6 +67,13 @@ public class Interpreter implements Expr.Visitor<Object>,
     }
 
     @Override
+    public Void visitFunctionStmt(Stmt.Function stmt) {
+        GooberFunction function = new GooberFunction(stmt, environment);
+        environment.define(stmt.name.lexeme, function);
+        return null;
+    }
+
+    @Override
     public Void visitPrintStmt(Stmt.Print stmt) {
         Object value = evaluate(stmt.expression);
         System.out.println(stringify(value));
@@ -82,6 +89,14 @@ public class Interpreter implements Expr.Visitor<Object>,
 
         environment.define(stmt.name.lexeme, value);
         return null;
+    }
+
+    @Override
+    public Void visitReturnStmt(Stmt.Return stmt) {
+        Object value = null;
+        if (stmt.value != null) value = evaluate(stmt.value);
+
+        throw new Return(value);
     }
 
     // Visiting Expressions
