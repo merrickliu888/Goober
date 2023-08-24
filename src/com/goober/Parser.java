@@ -56,6 +56,7 @@ public class Parser {
         if (match(LEFT_CURLY_BRACE)) return new Stmt.Block(block());
         if (match(WHILE)) return whileStatement();
         if (match(FOR)) return forStatement();
+        if (match(FUNCTION)) return function("function");
         if (match(RETURN)) return returnStatement();
 
         return expressionStatement();
