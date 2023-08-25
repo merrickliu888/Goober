@@ -161,6 +161,14 @@ public class Resolver implements Expr.Visitor<Object>,
         currentFunction = enclosingFunction;
     }
 
+    private void beginScope() {
+        scopes.push(new HashMap<String, Boolean>());
+    }
+
+    private void endScope() {
+        scopes.pop();
+    }
+
     private void resolveLocal(Expr expr, Token name) {
         for (int i = scopes.size() - 1; i >= 0; i--) {
             if (scopes.get(i).containsKey(name.lexeme)) {
@@ -168,14 +176,6 @@ public class Resolver implements Expr.Visitor<Object>,
                 return;
             }
         }
-    }
-
-    private void beginScope() {
-        scopes.push(new HashMap<String, Boolean>());
-    }
-
-    private void endScope() {
-        scopes.pop();
     }
 
     void resolve(List<Stmt> statements) {
