@@ -60,6 +60,12 @@ public class Goober {
         List<Stmt> statements = parser.parse();
         if (hadError) return;  // Stop if there was a syntax error
 
+        // Resolving
+        Resolver resolver = new Resolver(interpreter);
+        resolver.resolve(statements);
+        if (hadError) return;
+
+        // Interpreting
         interpreter.interpret(statements);
     }
 

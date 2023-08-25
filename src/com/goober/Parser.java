@@ -208,7 +208,7 @@ public class Parser {
                 return new Expr.Assignment(name, value);
             }
 
-            throw error(assignment_target, "Invalid assignment target.");
+            error(assignment_target, "Invalid assignment target.");
         }
 
         return expr;
