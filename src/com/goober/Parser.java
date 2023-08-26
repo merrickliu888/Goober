@@ -1,5 +1,6 @@
 package com.goober;
 
+import java.sql.Array;
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +32,7 @@ public class Parser {
     private Stmt declaration() {
         try {
             if (match(VAR)) return varDeclaration();
+            if (match(CLASS)) return classDeclaration();
             return statement();
         } catch (ParseError error) {
             synchronize();
@@ -48,6 +50,19 @@ public class Parser {
 
         consume(SEMICOLON, "Expect ';' after variable declaration.");
         return new Stmt.Var(name, initializer);
+    }
+
+    private Stmt classDeclaration() {
+        Token name = consume(IDENTIFIER, "Expect class name.");
+        consume(LEFT_CURLY_BRACE, "Expect '{' before class body.");
+
+        List<Stmt.Function> methods = new ArrayList<>();
+        while (!check(RIGHT_CURLY_BRACE) & !isAtEnd()) {
+            methods.add(function("method"));
+        }
+
+        consume(RIGHT_CURLY_BRACE, "Expect '}' after class body.");
+        return new Stmt.Class(name, methods);
     }
 
     private Stmt statement() {
@@ -206,6 +221,9 @@ public class Parser {
             if (expr instanceof Expr.Variable) {
                 Token name = ((Expr.Variable)expr).name;
                 return new Expr.Assignment(name, value);
+            } else if (expr instanceof Expr.Get) {
+                Expr.Get get = (Expr.Get)expr;
+                return new Expr.Set(get.object, get.name, value);
             }
 
             error(assignment_target, "Invalid assignment target.");
@@ -302,6 +320,9 @@ public class Parser {
         while (true) {
             if (match(LEFT_PAREN)) {
                 expr = finishCall(expr);
+            } else if (match(DOT)) {
+                Token name = consume(IDENTIFIER, "Expect property name after '.'.");
+                expr = new Expr.Get(expr, name);
             } else {
                 break;
             }
@@ -327,6 +348,7 @@ public class Parser {
         if (match(FALSE)) return new Expr.Literal(false);
         if (match(TRUE)) return new Expr.Literal(true);
         if (match(NULL)) return new Expr.Literal(null);
+        if (match(THIS)) return new Expr.This(previous());
 
         if (match(NUMBER, STRING)) {
             return new Expr.Literal(previous().literal);
@@ -341,6 +363,7 @@ public class Parser {
             consume(RIGHT_PAREN, "Expect ')' after expression.");
             return new Expr.Grouping(expr);
         }
+
         throw error(peek(), "Expression expected");
     }
 

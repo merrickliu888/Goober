@@ -5,10 +5,18 @@ import java.util.List;
 public class GooberFunction implements GooberCallable{
     private final Stmt.Function declaration;
     private final Environment closure;
+    private final boolean isInitializer;
 
-    GooberFunction(Stmt.Function declaration, Environment closure) {
+    GooberFunction(Stmt.Function declaration, Environment closure, boolean isInitializer) {
+        this.isInitializer = isInitializer;
         this.declaration = declaration;
         this.closure = closure;
+    }
+
+    GooberFunction bind(GooberInstance instance) {
+        Environment environment = new Environment(closure);
+        environment.define("this", instance);
+        return new GooberFunction(declaration, environment, isInitializer);
     }
 
     @Override
@@ -20,8 +28,11 @@ public class GooberFunction implements GooberCallable{
         try {
             interpreter.executeBlock(declaration.body, environment);
         } catch (Return returnValue) {
+            if (isInitializer) return closure.getAt(0, "this");
             return returnValue.value;
         }
+
+        if (isInitializer) return closure.getAt(0, "this");
         return null;
     }
 

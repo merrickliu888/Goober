@@ -76,7 +76,7 @@ public class Interpreter implements Expr.Visitor<Object>,
 
     @Override
     public Void visitFunctionStmt(Stmt.Function stmt) {
-        GooberFunction function = new GooberFunction(stmt, environment);
+        GooberFunction function = new GooberFunction(stmt, environment, false);
         environment.define(stmt.name.lexeme, function);
         return null;
     }
@@ -96,6 +96,21 @@ public class Interpreter implements Expr.Visitor<Object>,
         }
 
         environment.define(stmt.name.lexeme, value);
+        return null;
+    }
+
+    @Override
+    public Void visitClassStmt(Stmt.Class stmt) {
+        environment.define(stmt.name.lexeme, null);
+
+        Map<String, GooberFunction> methods = new HashMap<>();
+        for (Stmt.Function method : stmt.methods) {
+            GooberFunction function = new GooberFunction(method, environment, method.name.lexeme.equals("init"));
+            methods.put(method.name.lexeme, function);
+        }
+
+        GooberClass klass = new GooberClass(stmt.name.lexeme, methods);
+        environment.assign(stmt.name, klass);
         return null;
     }
 
@@ -182,6 +197,27 @@ public class Interpreter implements Expr.Visitor<Object>,
     }
 
     @Override
+    public Object visitGetExpr(Expr.Get expr) {
+        Object object = evaluate(expr.object);
+        if (object instanceof GooberInstance) {
+            return (((GooberInstance) object).get(expr.name));
+        }
+        throw new RuntimeError(expr.name, "Only instances have properties.");
+    }
+
+    @Override
+    public Object visitSetExpr(Expr.Set expr) {
+        Object object = evaluate(expr.object);
+        if (!(object instanceof GooberInstance)) {
+            throw new RuntimeError(expr.name, "Only instances have properties.");
+        }
+
+        Object value = evaluate(expr.value);
+        ((GooberInstance)object).set(expr.name, value);
+        return value;
+    }
+
+    @Override
     public Object visitBinaryExpr(Expr.Binary expr) {
         Object left = evaluate(expr.left);
         Object right = evaluate(expr.right);
@@ -229,6 +265,11 @@ public class Interpreter implements Expr.Visitor<Object>,
     @Override
     public Object visitVariableExpr(Expr.Variable expr) {
         return lookUpVariable(expr.name, expr);
+    }
+
+    @Override
+    public Object visitThisExpr(Expr.This expr) {
+        return lookUpVariable(expr.keyword, expr);
     }
 
     // Helper methods

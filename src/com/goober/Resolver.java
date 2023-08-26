@@ -10,11 +10,20 @@ public class Resolver implements Expr.Visitor<Object>,
     private final Interpreter interpreter;
     private final Stack<Map<String, Boolean>> scopes = new Stack<>();
     private FunctionType currentFunction = FunctionType.NONE;
+    private ClassType currentClass = ClassType.NONE;
 
     private enum FunctionType {
         NONE,
-        FUNCTION
+        FUNCTION,
+        METHOD,
+        INITIALIZER
     }
+    private enum ClassType {
+        NONE,
+        CLASS
+    }
+
+
 
     Resolver(Interpreter interpreter) {
         this.interpreter = interpreter;
@@ -44,6 +53,28 @@ public class Resolver implements Expr.Visitor<Object>,
             Goober.error(expr.name, "Can't read local variable in its own initializer.");
         }
         resolveLocal(expr, expr.name);
+        return null;
+    }
+
+    @Override
+    public Void visitClassStmt(Stmt.Class stmt) {
+        ClassType enclosingClass = currentClass;
+        currentClass = ClassType.CLASS;
+        declare(stmt.name);
+        define(stmt.name);
+
+        beginScope();
+        scopes.peek().put("this", true);
+
+        for (Stmt.Function method : stmt.methods) {
+            FunctionType declaration = FunctionType.METHOD;
+            if (method.name.lexeme.equals("init")) declaration = FunctionType.INITIALIZER;
+            resolveFunction(method, declaration);
+        }
+
+        endScope();
+
+        currentClass = enclosingClass;
         return null;
     }
 
@@ -92,6 +123,9 @@ public class Resolver implements Expr.Visitor<Object>,
         }
 
         if (stmt.value != null) {
+            if (currentFunction == FunctionType.INITIALIZER) {
+                Goober.error(stmt.keyword, "Can't return a value from an initializer.");
+            }
             resolve (stmt.value);
         }
 
@@ -124,6 +158,19 @@ public class Resolver implements Expr.Visitor<Object>,
     }
 
     @Override
+    public Object visitGetExpr(Expr.Get expr) {
+        resolve(expr.object);
+        return null;
+    }
+
+    @Override
+    public Object visitSetExpr(Expr.Set expr) {
+        resolve(expr.value);
+        resolve(expr.object);
+        return null;
+    }
+
+    @Override
     public Object visitGroupingExpr(Expr.Grouping expr) {
         resolve(expr.expression);
         return null;
@@ -144,6 +191,16 @@ public class Resolver implements Expr.Visitor<Object>,
     @Override
     public Object visitUnaryExpr(Expr.Unary expr) {
         resolve(expr.right);
+        return null;
+    }
+
+    @Override
+    public Object visitThisExpr(Expr.This expr) {
+        if (currentClass == ClassType.NONE) {
+            Goober.error(expr.keyword, "Can't use 'this' outside of a class.");
+        }
+
+        resolveLocal(expr, expr.keyword);
         return null;
     }
 
