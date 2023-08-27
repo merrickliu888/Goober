@@ -20,7 +20,8 @@ public class Resolver implements Expr.Visitor<Object>,
     }
     private enum ClassType {
         NONE,
-        CLASS
+        CLASS,
+        SUBCLASS
     }
 
 
@@ -63,6 +64,17 @@ public class Resolver implements Expr.Visitor<Object>,
         declare(stmt.name);
         define(stmt.name);
 
+        if (stmt.superclass != null && stmt.name.lexeme.equals(stmt.superclass.name.lexeme)) {
+            Goober.error(stmt.superclass.name, "A class cannot inherit from itself.");
+        }
+
+        if (stmt.superclass != null) {
+            currentClass = ClassType.SUBCLASS;
+            resolve(stmt.superclass);
+            beginScope();
+            scopes.peek().put("super", true);
+        }
+
         beginScope();
         scopes.peek().put("this", true);
 
@@ -74,6 +86,7 @@ public class Resolver implements Expr.Visitor<Object>,
 
         endScope();
 
+        if (stmt.superclass != null) endScope();
         currentClass = enclosingClass;
         return null;
     }
@@ -198,6 +211,18 @@ public class Resolver implements Expr.Visitor<Object>,
     public Object visitThisExpr(Expr.This expr) {
         if (currentClass == ClassType.NONE) {
             Goober.error(expr.keyword, "Can't use 'this' outside of a class.");
+        }
+
+        resolveLocal(expr, expr.keyword);
+        return null;
+    }
+
+    @Override
+    public Object visitSuperExpr(Expr.Super expr) {
+        if (currentClass == ClassType.NONE)  {
+            Goober.error(expr.keyword, "Can't use 'super' outside of a class.");
+        } else if (currentClass != ClassType.SUBCLASS) {
+            Goober.error(expr.keyword, "Can't use 'super' in a class with no superclass");
         }
 
         resolveLocal(expr, expr.keyword);

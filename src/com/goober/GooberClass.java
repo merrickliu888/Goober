@@ -5,16 +5,22 @@ import java.util.Map;
 
 public class GooberClass implements GooberCallable {
     final String name;
+    final GooberClass superclass;
     private final Map<String, GooberFunction> methods;
 
-    GooberClass(String name, Map<String, GooberFunction> methods) {
+    GooberClass(String name, GooberClass superclass ,Map<String, GooberFunction> methods) {
         this.name = name;
+        this.superclass = superclass;
         this.methods = methods;
     }
 
     GooberFunction findMethod(String name) {
         if (methods.containsKey(name)) {
             return methods.get(name);
+        }
+
+        if (superclass != null) {
+            return superclass.findMethod(name);
         }
 
         return null;
