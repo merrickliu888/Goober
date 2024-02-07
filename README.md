@@ -9,6 +9,6 @@ An interpreted, dynamically typed, object oriented programming language built in
 
 The goal was to gain a conceptual understanding of how programming languages are built and work under the hood (unboxing the black box). Additionally, the challenge instilled a deeper understanding of Computer Science and programming within.
 
-Sources: [https://www.craftinginterpreters.com/](*Crafting Interpreters*) by Robert Nystrom, *UofT CSC110/111 Course Notes* by Professor David Liu and Mario Badr, and various Youtube Videos by Low Level Game Dev, Neso Academy, and AstroSam.
+Sources: [*Crafting Interpreters*](https://www.craftinginterpreters.com/) by Robert Nystrom, *UofT CSC110/111 Course Notes* by Professor David Liu and Mario Badr, and various Youtube Videos by Low Level Game Dev, Neso Academy, and AstroSam.
 
 
